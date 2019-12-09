@@ -42,7 +42,15 @@ export function fetchLyrics(title, artist, musicMatchId, localSongId, dispatch) 
     response => response.json(),
     error => console.error('An error occurred', error)
   ).then(function(json) {
-    console.log('hey wow api 2', json);
+    if (json.message.body.lyrics) {
+      let lyrics = json.message.body.lyrics.lyrics_body;
+      lyrics = lyrics.replace('"', '');
+      const songArray = lyrics.split(/\n/g).filter(entry => entry !='');
+      dispatch(receiveSong(title, artist, localSongId, songArray));
+      dispatch(changeSong(localSongId));
+    } else {
+      console.log('We couldn\'t locate lyrics for this song!');
+    }
   });
 }
 
